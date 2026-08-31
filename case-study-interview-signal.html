@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interview Signal Extractor — Case Study — Arthi Vinod</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="ambient-bg" aria-hidden="true">
+  <div class="wisp-parallax" style="--depth:1"><div class="wisp wisp-1"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:0.6"><div class="wisp wisp-2"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:1.3"><div class="wisp wisp-3"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:0.8"><div class="wisp wisp-4"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:1.1"><div class="wisp wisp-5"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+</div>
+
+<canvas id="trailCanvas" aria-hidden="true"></canvas>
+
+<div class="cs-page-header">
+  <a href="index.html#sectionWork" class="mock-link">
+    <span class="tick tick-tl"></span><span class="tick tick-br"></span>
+    ← Back to portfolio
+  </a>
+</div>
+
+<section class="case-study" id="caseStudyInterviewSignal">
+  <div class="cs-inner">
+    <p class="mock-eyebrow">Case Study</p>
+    <h2 class="mock-heading">Interview Signal Extractor</h2>
+    <p class="cs-premise">Interview signal decays the moment the call ends. This captures it before it does.</p>
+    <p class="cs-disclaimer">An original system design, informed by my work on interview intelligence at Employ Inc — not a description of Pillar's proprietary implementation, UI, or data. Business impact figures below are reasoned estimates, not measured production numbers.</p>
+
+    <div class="cs-section">
+      <h3>1. The Original Workflow</h3>
+      <p>A hiring manager runs a 45-minute structured interview while simultaneously taking notes — which means the notes are necessarily incomplete, because attention is split between listening, asking good follow-ups, and writing. Within 24–48 hours (often longer, once the rest of the week's calendar hits), they open the recording or raw transcript and reconstruct their evaluation from memory: scrubbing to the "tell me about a time..." answer, replaying it at 1.5x, manually copying two or three quotes into a scorecard field per competency, then assigning a 1–4 rating that's really a blend of the transcript, their notes, and how they felt about the candidate by the end of the call.</p>
+      <p>This repeats per interviewer, per candidate. For one open role, a realistic funnel is 5 candidates through 3 relevant interview rounds each — 15 scorecards, at roughly 20–25 minutes of write-up per scorecard once quote-hunting and note cleanup are included. That's on top of the interview itself, done by people whose actual job isn't writing scorecards.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>2. The Friction Points</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Friction</th><th>Root Cause</th><th>Impact</th></tr></thead>
+          <tbody>
+            <tr><td>Quote loss over time</td><td>Real-time notes are incomplete by construction — the interviewer is also running the conversation</td><td>By debrief, interviewers can't produce the specific evidence behind their score, so ratings collapse into "vibes"</td></tr>
+            <tr><td>Recency/primacy bias in comparison</td><td>Humans over-weight the most recent or most emotionally memorable candidate when comparing several for one role</td><td>Strong early candidates get unfairly discounted; weak-but-recent candidates get overrated</td></tr>
+            <tr><td>Inconsistent rubric application</td><td>No two interviewers decompose "communication" or "ownership" the same way without an enforced structure</td><td>The same competency label means different things depending on who scored it, so aggregate scores aren't comparable</td></tr>
+            <tr><td>Scorecard write-up as a bottleneck</td><td>20+ minutes of manual write-up per interview, per interviewer</td><td>Interviewers rush or skip scorecards under sprint pressure, especially for later-round candidates</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cs-section">
+      <h3>3. Prerequisites</h3>
+      <ol class="cs-numbered">
+        <li><b>Reliable, speaker-diarized transcription.</b> Extraction against a transcript that can't reliably tell interviewer from candidate speech is worse than no extraction — it just launders bad input into confident-looking output.</li>
+        <li><b>A defined, versioned competency rubric with written score anchors</b> (what a 1 looks like vs. a 4 for "Ownership") must exist before any AI scoring is possible. Without explicit anchors, the model has nothing legitimate to score against.</li>
+        <li><b>A supervised pilot where interviewers see AI output alongside their own, not instead of it.</b> If the first thing any interviewer experiences is "the AI scored my candidate and I disagree," adoption dies on contact.</li>
+      </ol>
+    </div>
+
+    <div class="cs-section">
+      <h3>4. The AI-Enabled Redesign</h3>
+      <ol class="cs-numbered">
+        <li><b>Ingest &amp; diarize</b> — transcript ingested immediately post-interview, speaker-labeled and timestamped.</li>
+        <li><b>Competency-anchored extraction</b> — the model reads the full transcript against the versioned rubric and pulls candidate statements that map to each competency, not a free-form summary.</li>
+        <li><b>Confidence-scored classification</b> — for each competency, the model assigns a 1–4 score and a confidence level, and always surfaces the 1–3 direct quotes that justify it.</li>
+        <li><b>Cross-interview aggregation</b> — once all interviewers for a candidate submit, the system aggregates scores per competency and flags contradictions.</li>
+        <li><b>Human-reviewable draft, not an autofilled answer</b> — the interviewer gets a pre-filled scorecard within minutes, with quotes attached, and edits it rather than starting from a blank page.</li>
+      </ol>
+    </div>
+
+    <div class="cs-section">
+      <h3>5. Human Fallback Triggers</h3>
+      <ul class="cs-list">
+        <li><b>Confidence below threshold</b> (e.g. &lt;70%) on any competency — left for human review, never auto-populated with a best guess.</li>
+        <li><b>Any quote flagged by a bias-language check</b> (age, family/parental status, accent, national origin, disability, or similar) — withheld entirely; the competency is flagged <code>potential_bias_signal</code> and a human reviews the raw transcript directly.</li>
+        <li><b>Contradictory scores across interviewers</b> on the same candidate/competency (&gt;2-point spread on a 4-point scale) — routed into the debrief discussion, never silently averaged.</li>
+        <li><b>Transcripts under a minimum length/turn-count</b> (e.g. a call that dropped after 8 minutes) — flagged as insufficient signal; no score generated at all.</li>
+        <li><b>Low diarization confidence</b> — routed to manual review, since extraction on a garbled transcript is worse than none.</li>
+      </ul>
+    </div>
+
+    <div class="cs-section">
+      <h3>6. Sample AI Prompt</h3>
+      <div class="cs-code"><span class="cs-code-label">System prompt</span>You are an interview signal extraction assistant. You are given a timestamped,
+speaker-diarized interview transcript and a versioned competency rubric. Your job
+is to extract evidence-backed competency scores, not general impressions.
+
+For each competency in the rubric:
+1. Read the transcript for candidate statements (not interviewer statements) that
+   provide direct evidence for that competency.
+2. Assign a score from 1-4 using ONLY the rubric's written anchors for that
+   competency and score level. Do not substitute your own judgment of what "good"
+   looks like.
+3. Attach 1-3 direct, verbatim quotes (with timestamps) that justify the score.
+   Never paraphrase a quote.
+4. Assign a confidence level (high/medium/low). If the candidate never clearly
+   addressed a competency, output "insufficient_signal" instead of guessing.
+5. If a quote references a candidate's age, family/parental status, accent,
+   national origin, disability, or other protected characteristic, do not include
+   it or use it to inform the score. Flag the competency "potential_bias_signal"
+   and output no score.
+
+Never invent a quote. Never round a low-confidence score up to look more decisive.
+When uncertain, under-claim, not over-claim.
+
+Output strict JSON:
+{ "competency": string, "score": 1-4 | null, "confidence": "high"|"medium"|"low",
+  "quotes": [{ "text": string, "timestamp": string }],
+  "flag": "none"|"needs_human_review"|"potential_bias_signal"|"insufficient_signal" }</div>
+
+      <div class="cs-code"><span class="cs-code-label">Example input — competency: "Ownership" (rubric anchor for 4: candidate identifies and acts on a problem outside their explicit scope, without being asked, and drives it to a measurable outcome)</span>[00:14:22] Interviewer: Tell me about a time you owned a problem that wasn't
+originally yours.
+[00:14:31] Candidate: We had a support escalation queue that kept growing and
+nobody actually owned triaging it — it technically sat between two teams. I
+didn't wait for someone to assign it to me. I pulled the last 200 tickets,
+tagged the root causes myself over a weekend, and proposed a routing change to
+my manager on Monday. We cut the backlog by half in three weeks.</div>
+
+      <div class="cs-code"><span class="cs-code-label">Example output</span>{
+  "competency": "Ownership",
+  "score": 4,
+  "confidence": "high",
+  "quotes": [
+    { "text": "it technically sat between two teams. I didn't wait for someone to assign it to me.", "timestamp": "00:14:31" },
+    { "text": "I pulled the last 200 tickets, tagged the root causes myself over a weekend", "timestamp": "00:14:31" },
+    { "text": "We cut the backlog by half in three weeks.", "timestamp": "00:14:31" }
+  ],
+  "flag": "none"
+}</div>
+      <p class="cs-caption"><b>Error handling:</b> if the transcript segment relevant to a competency is missing, garbled below diarization confidence threshold, or the candidate's response doesn't address the competency at all, the model outputs <code>score: null</code>, <code>confidence: "low"</code>, <code>flag: "insufficient_signal"</code> — a missing score is always preferable to a fabricated one.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>7. Prompt Testing</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Case</th><th>Input</th><th>Expected Output</th><th>What a Bad Result Reveals</th></tr></thead>
+          <tbody>
+            <tr><td>Clear</td><td>The Ownership example above</td><td>Score 4, confidence high, 2–3 verbatim quotes, flag none</td><td>Paraphrasing instead of quoting, or hedging to a 3 on unambiguous evidence, means the model is under-confident on clear signal</td></tr>
+            <tr><td>Ambiguous / low-signal</td><td>"I'm definitely a team player, I think collaboration is super important" — no concrete example</td><td>Confidence low, flag <code>insufficient_signal</code>, no score forced</td><td>Scoring this 3–4 on positive sentiment alone means the model is pattern-matching on tone instead of requiring evidence — the most dangerous failure mode here</td></tr>
+            <tr><td>Multi-signal / contradictory</td><td>Candidate's "ownership" story reveals they bypassed their manager and caused friction with a peer team</td><td>Ownership scored honestly, and the friction surfaced as relevant to Collaboration — not silently resolved in the candidate's favor</td><td>Only extracting the flattering half of the story reveals a selection bias toward positive-sounding evidence</td></tr>
+            <tr><td>Edge case</td><td>Call dropped after 6 minutes, before any competency questions were reached</td><td><code>insufficient_signal</code> on every competency, no scores, no invented summary</td><td>Summarizing technical difficulty as a soft-skills read ("stayed calm under pressure") reveals the model fabricating signal from irrelevant content</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cs-section">
+      <h3>8. Business Impact</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Metric</th><th>Before</th><th>After</th><th>Reasoning</th></tr></thead>
+          <tbody>
+            <tr><td>Scorecard write-up time per interview</td><td>~22 min</td><td>~6 min</td><td>Quote-hunting and re-listening is the dominant time cost; editing a pre-filled, quote-attached draft is materially faster than writing one from scratch</td></tr>
+            <tr><td>Time-to-scorecard availability</td><td>~24–48 hrs (batched)</td><td>&lt;15 min</td><td>Generation runs immediately once the transcript is ready, closing the recall-decay gap that causes quote loss</td></tr>
+            <tr><td>Contradictory scores caught before debrief</td><td>~0% (surfaced informally, if at all)</td><td>~100% (structurally flagged)</td><td>A capability change, not an incremental one — every scorecard pair is checked automatically instead of relying on someone noticing mid-conversation</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cs-math"><b>The math, shown:</b> 5 candidates × 3 relevant interview rounds = 15 scorecards per open role. At 22&nbsp;min → 6&nbsp;min, that's 16 minutes saved × 15 = <b>240 minutes (4 hours) saved per hiring cycle</b> — before counting the time saved in debrief meetings that no longer re-litigate half-remembered impressions.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>9. Product Thinking — Risks &amp; Tradeoffs</h3>
+      <p><b>Risk: AI competency scoring could encode or amplify bias if not carefully designed.</b> A rubric-anchored score is only as fair as the rubric and the model's application of it. Score distributions get audited per interviewer and per candidate demographic slice on a regular cadence, not just at launch; the bias-language flag in Section 5 exists specifically to pull suspect content out of the automated path entirely rather than let the model quietly "handle" it.</p>
+      <p><b>Risk: over-trusting AI-generated scorecards could reduce interviewer rigor over time.</b> If a pre-filled draft is good enough often enough, interviewers may stop critically checking it — the same complacency risk as autocomplete. The tool is positioned and measured as a drafting aid, not a scoring authority; edit rates are tracked, and a sustained near-zero edit rate on a given interviewer is itself a flag worth investigating, not a success metric.</p>
+      <p><b>Design choice — what stays human, and why:</b> final hiring decisions, any borderline scoring call (defined by the confidence threshold in Section 5), and anything bias-flagged. The system is built to produce evidence and a first-pass read, never a verdict.</p>
+      <p><b>Dependency: quality is bounded by the rubric, not the model.</b> A vague or poorly-anchored rubric produces vague, poorly-anchored scores no matter how good the extraction is — garbage rubric in, garbage signal out. This is why Prerequisite #2 isn't optional.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>10. Portfolio Assets to Build</h3>
+      <ul class="cs-list">
+        <li>A before/after workflow diagram (manual multi-day recall-based process vs. the AI-assisted near-real-time flow)</li>
+        <li>The system prompt and sample output above, presented as readable code (already built)</li>
+        <li>A mockup of the scorecard output UI — competency rows, score, confidence badge, attached quotes, and a distinct visual state for "needs human review"</li>
+        <li>A short rollout/pilot plan: <b>Phase 1</b> — shadow mode on one team for two hiring cycles, AI output visible but never used in decisions; <b>Phase 2</b> — opt-in default draft for volunteering interviewers, human edit required before submit; <b>Phase 3</b> — default rollout with all fallback triggers active, no scorecard ever reaches a hiring decision without human sign-off</li>
+      </ul>
+    </div>
+
+    <a href="index.html#sectionWork" class="mock-link cs-back-link">
+      <span class="tick tick-tl"></span><span class="tick tick-br"></span>
+      ← Back to portfolio
+    </a>
+  </div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>

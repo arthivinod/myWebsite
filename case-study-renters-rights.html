@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Renter's Rights Assistant — Case Study — Arthi Vinod</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="ambient-bg" aria-hidden="true">
+  <div class="wisp-parallax" style="--depth:1"><div class="wisp wisp-1"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:0.6"><div class="wisp wisp-2"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:1.3"><div class="wisp wisp-3"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:0.8"><div class="wisp wisp-4"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:1.1"><div class="wisp wisp-5"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+</div>
+
+<canvas id="trailCanvas" aria-hidden="true"></canvas>
+
+<div class="cs-page-header">
+  <a href="index.html#sectionWork" class="mock-link">
+    <span class="tick tick-tl"></span><span class="tick tick-br"></span>
+    ← Back to portfolio
+  </a>
+</div>
+
+<section class="case-study" id="caseStudyRentersRights">
+  <div class="cs-inner">
+    <p class="mock-eyebrow">Case Study</p>
+    <h2 class="mock-heading">Renter's Rights Assistant</h2>
+    <p class="cs-premise">One side of this lease has read a hundred others. Now you have too.</p>
+    <p class="cs-disclaimer">Built as "FinePrint" — a real, working prototype — <a href="https://github.com/arthivinod" target="_blank" rel="noopener">view the repo</a>. Both halves of the RAG pipeline (retrieval and generation) run live for every query, on real embeddings and a real, deliberately narrow knowledge base — no staged fallback data. Business impact figures below are reasoned estimates, not measured production numbers.</p>
+
+    <div class="cs-section">
+      <h3>1. The Original Workflow</h3>
+      <p>Landlords have seen dozens of leases; their lawyers wrote the template. A first-time renter is staring at theirs for the first time, trying to figure out if "landlord may enter for inspection" is normal or a problem. Today that means googling the individual phrase, sifting through forum answers and blog posts that rarely say which state's law they're describing, and — if the deadline to sign is close, which it usually is — giving up on researching every clause and just signing.</p>
+      <p>For someone diligent enough to actually try, this is realistically 1–2 hours of scattered searching per lease, with genuinely unreliable results at the end: general web search doesn't know that India's tenancy law is state-specific, or that Karnataka in particular hasn't adopted the central Model Tenancy Act that most online advice assumes applies uniformly.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>2. The Friction Points</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Friction</th><th>Root Cause</th><th>Impact</th></tr></thead>
+          <tbody>
+            <tr><td>No single source of truth for "is this clause normal"</td><td>Indian tenancy law is state-specific and most online advice doesn't say which state it applies to</td><td>Renters can't tell if a clause is standard practice or a red flag</td></tr>
+            <tr><td>Confident answers regardless of actual knowledge</td><td>General search results and chatbots don't reliably ground answers in the current, applicable law text</td><td>A wrong confident answer is worse than "I don't know" — a renter might dismiss a real red flag or panic over a normal clause</td></tr>
+            <tr><td>Legal help is slow and expensive</td><td>A lawyer consultation costs money and takes days to schedule for a decision that has to be made before signing</td><td>Renters end up signing without review because the lease deadline moves faster than the legal-advice pipeline</td></tr>
+            <tr><td>Karnataka hasn't adopted the Model Tenancy Act</td><td>Most Indian tenancy content online assumes the central Act applies uniformly</td><td>A Karnataka renter relying on generic "Model Tenancy Act" advice could be told incorrect defaults</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cs-section">
+      <h3>3. Prerequisites</h3>
+      <ol class="cs-numbered">
+        <li><b>A curated, embedded knowledge base has to exist before retrieval works.</b> An empty or generic knowledge base would make the pipeline retrieve nothing relevant, or worse, something plausible-sounding but wrong.</li>
+        <li><b>The system has to be honest about jurisdictional gaps</b> — like Karnataka not having adopted the central Act — rather than presenting one uniform national answer, or it actively misleads state-specific renters.</li>
+        <li><b>Genuinely low-cost embeddings and generation,</b> to keep this viable as a self-funded, freely usable tool. This shaped real build decisions — Voyage AI's free-tier embeddings, Gemini's free-tier generation — rather than assuming a paid API budget.</li>
+      </ol>
+    </div>
+
+    <div class="cs-section">
+      <h3>4. The AI-Enabled Redesign</h3>
+      <ol class="cs-numbered">
+        <li><b>Ask</b> — the user pastes a lease clause, or asks a plain-English question.</li>
+        <li><b>Retrieve</b> — the question is embedded (Voyage AI <code>voyage-4-lite</code>) and compared by cosine similarity against every chunk in the knowledge base — the Model Tenancy Act 2021, Karnataka-specific rental practice, and a curated set of common red-flag clause patterns. The scan runs live across every provision, and the ones that actually match light up and stay lit.</li>
+        <li><b>Analyze</b> — only the retrieved chunks are handed to the generation model (Gemini <code>gemini-3.5-flash</code>, thinking mode off — this is grounded classification, not open reasoning), instructed to ground every claim in them and cite the source.</li>
+        <li><b>Judge</b> — each issue gets a severity read — fine, worth questioning, red flag — plus a quote card showing the exact law fragment or clause pattern it's grounded in.</li>
+      </ol>
+    </div>
+
+    <div class="cs-section">
+      <h3>5. Human Fallback Triggers</h3>
+      <ul class="cs-list">
+        <li><b>No retrieved chunk clears a minimum similarity threshold</b> for the question asked — the system says the knowledge base doesn't confidently cover this, rather than answering from the model's unverified general knowledge.</li>
+        <li><b>The question relates to a state outside the knowledge base's coverage</b> (anything beyond the Model Tenancy Act baseline and Karnataka specifics) — flagged explicitly as out of scope rather than answered with an assumed-uniform national answer.</li>
+        <li><b>Retrieved chunks conflict</b> (e.g. a red-flag pattern and a "this is standard practice" note both match) — both are surfaced with their individual citations, rather than the model silently picking one.</li>
+        <li><b>Anything requiring advice specific to the user's individual circumstances</b> — the system stays at "here's what the law/pattern says," never "here's what you personally should do," and says so explicitly.</li>
+      </ul>
+    </div>
+
+    <div class="cs-section">
+      <h3>6. Sample AI Prompt</h3>
+      <div class="cs-code"><span class="cs-code-label">System prompt — retrieval-grounded clause classification</span>You are a lease-clause analysis assistant. You are given a user's question or
+pasted lease clause, plus a set of retrieved source chunks from a fixed
+knowledge base (Model Tenancy Act 2021 text, Karnataka-specific rental
+practice notes, and known red-flag clause patterns).
+
+Rules:
+1. Answer using ONLY the retrieved chunks provided. Do not use outside
+   knowledge of tenancy law, even if you believe it to be correct.
+2. For each point you make, attach the exact source chunk it came from as a
+   citation.
+3. Classify the clause/question as one of: "fine" | "worth_questioning" |
+   "red_flag".
+4. If the retrieved chunks don't clearly cover the question, or coverage is
+   uncertain for the user's likely state, say so explicitly rather than
+   answering from general knowledge. Output classification:
+   "insufficient_coverage" instead of guessing.
+5. If retrieved chunks conflict with each other, present both perspectives
+   with their separate citations rather than resolving the conflict yourself.
+
+Output strict JSON:
+{ "classification": "fine"|"worth_questioning"|"red_flag"|"insufficient_coverage",
+  "explanation": string,
+  "citations": [{ "source": string, "quote": string }] }</div>
+
+      <div class="cs-code"><span class="cs-code-label">Example input — retrieved chunk: Model Tenancy Act 2021 §16 (entry notice requirements); question: "My lease says landlord may enter anytime for inspection, no notice required. Is that normal?"</span>[retrieved: "The landlord shall give at least twenty-four hours' notice to
+the tenant before entering the premises for inspection or repair, except in
+case of emergency." — Model Tenancy Act 2021, §16]</div>
+
+      <div class="cs-code"><span class="cs-code-label">Example output</span>{
+  "classification": "red_flag",
+  "explanation": "The Model Tenancy Act 2021 requires landlords to give at least 24 hours' notice before entry for inspection, except in emergencies. A clause permitting entry 'anytime' with no notice conflicts with this baseline.",
+  "citations": [
+    { "source": "Model Tenancy Act 2021, §16", "quote": "The landlord shall give at least twenty-four hours' notice to the tenant before entering the premises for inspection or repair, except in case of emergency." }
+  ]
+}</div>
+      <p class="cs-caption"><b>Error handling:</b> if no retrieved chunk has meaningful similarity to the question, the model outputs <code>classification: "insufficient_coverage"</code>, an explanation stating the knowledge base doesn't cover this, and an empty citations array — never a fabricated citation to a chunk that wasn't actually retrieved.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>7. Prompt Testing</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Case</th><th>Input</th><th>Expected Output</th><th>What a Bad Result Reveals</th></tr></thead>
+          <tbody>
+            <tr><td>Clear</td><td>The entry-notice example above, clearly covered by a retrieved chunk</td><td><code>red_flag</code>, with an accurate, quoted citation</td><td>An uncited or paraphrased answer here means grounding isn't actually being enforced</td></tr>
+            <tr><td>Ambiguous / low-signal</td><td>A question about a clause type the 19-chunk knowledge base barely covers (e.g. a niche subletting clause)</td><td><code>insufficient_coverage</code>, not a guessed classification</td><td>Answering confidently anyway means the system is prioritizing having an answer over having a correct one</td></tr>
+            <tr><td>Multi-signal / contradictory</td><td>A Karnataka question where the Model Tenancy Act chunk suggests one answer, but a Karnataka-practice chunk notes the central Act isn't adopted there</td><td>Both citations surfaced with the jurisdictional caveat stated explicitly, not a single confident answer</td><td>Silently picking the national answer would give a Karnataka renter incorrect defaults — exactly the failure mode this project exists to prevent</td></tr>
+            <tr><td>Edge case</td><td>An unrelated question pasted by mistake (e.g. "what's a good rent negotiation script")</td><td><code>insufficient_coverage</code> or an explicit statement this isn't a fine/red-flag question, not a fabricated legal-sounding answer</td><td>Producing a confident-sounding answer to an out-of-scope question reveals the model filling gaps instead of admitting them</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cs-section">
+      <h3>8. Business Impact</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Metric</th><th>Before</th><th>After</th><th>Reasoning</th></tr></thead>
+          <tbody>
+            <tr><td>Time to get a grounded read on one clause</td><td>~15–20 min of googling and cross-referencing</td><td>~30 sec</td><td>Retrieval plus grounded generation collapses the manual cross-referencing step into a single query</td></tr>
+            <tr><td>Time to review a full lease (~15 clauses)</td><td>~1.5–2 hrs of scattered research</td><td>~10–15 min</td><td>Asking each clause in turn replaces open-ended search with a targeted, grounded question</td></tr>
+            <tr><td>Jurisdictional accuracy stated explicitly</td><td>Generic advice often silently assumes national uniformity</td><td>Every answer states its jurisdictional coverage, including the Karnataka gap</td><td>A capability, not a rate — the system either states its coverage honestly or it doesn't, and the fallback triggers ensure it does</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cs-math"><b>The math, shown:</b> 15 clauses worth checking in a typical lease, at ~7 minutes saved each (17–20 min of googling collapsed to ~30 sec of asking) ≈ <b>100+ minutes saved per lease reviewed</b> — before counting the value of catching a red flag that a rushed, deadline-pressured skim would have missed entirely.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>9. Product Thinking — Risks &amp; Tradeoffs</h3>
+      <p><b>Risk: a narrow, 19-chunk knowledge base could give a false sense of complete coverage</b> if the <code>insufficient_coverage</code> fallback doesn't trigger reliably. Mitigated by treating the similarity threshold as a product decision tuned conservatively — better to under-answer than overclaim, which is the project's own stated design principle.</p>
+      <p><b>Risk: users could treat a "worth_questioning" or "fine" classification as definitive legal advice</b> rather than a grounded read of general patterns. Mitigated with persistent framing that this isn't a substitute for a lawyer on anything genuinely high-stakes — a large deposit dispute already escalated, for instance.</p>
+      <p><b>Design choice — what stays out of scope, on purpose:</b> no state coverage beyond the Model Tenancy Act baseline and Karnataka, no lawyer marketplace, no accounts. This matches the project's own explicit scope stance rather than pretending to cover all of India before the jurisdictional-honesty work is actually done for each state.</p>
+      <p><b>Dependency: answer quality is bounded entirely by the knowledge base's completeness and chunking quality.</b> A RAG system is only as good as what's actually indexed — this one is deliberately small rather than deliberately wrong.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>10. Current State &amp; What's Next</h3>
+      <ul class="cs-list">
+        <li><b>Live today:</b> both halves of the RAG pipeline run for real, on every query — real embeddings (Voyage AI <code>voyage-4-lite</code>) and real generation (Gemini <code>gemini-3.5-flash</code>), no staged fallback data anywhere in the flow.</li>
+        <li><b>Scope, by design:</b> a 19-chunk knowledge base across three source documents — intentionally small, so it can be right about a little rather than confidently wrong about everything.</li>
+        <li><b>Not built yet:</b> no backend, auth, or persistence — state lives in React and resets on refresh. No coverage beyond Karnataka, no lawyer marketplace, no accounts.</li>
+        <li><b>Next build, honestly:</b> expanding state coverage past Karnataka is a phase-2 decision, not something to quietly bolt on without doing the same jurisdictional-honesty work already done here.</li>
+      </ul>
+    </div>
+
+    <a href="index.html#sectionWork" class="mock-link cs-back-link">
+      <span class="tick tick-tl"></span><span class="tick tick-br"></span>
+      ← Back to portfolio
+    </a>
+  </div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>

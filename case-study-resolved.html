@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resolved — Case Study — Arthi Vinod</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="ambient-bg" aria-hidden="true">
+  <div class="wisp-parallax" style="--depth:1"><div class="wisp wisp-1"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:0.6"><div class="wisp wisp-2"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:1.3"><div class="wisp wisp-3"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:0.8"><div class="wisp wisp-4"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+  <div class="wisp-parallax" style="--depth:1.1"><div class="wisp wisp-5"><div class="wisp-glow"></div><div class="wisp-blade"></div><div class="wisp-edge"></div></div></div>
+</div>
+
+<canvas id="trailCanvas" aria-hidden="true"></canvas>
+
+<div class="cs-page-header">
+  <a href="index.html#sectionWork" class="mock-link">
+    <span class="tick tick-tl"></span><span class="tick tick-br"></span>
+    ← Back to portfolio
+  </a>
+</div>
+
+<section class="case-study" id="caseStudyResolved">
+  <div class="cs-inner">
+    <p class="mock-eyebrow">Case Study</p>
+    <h2 class="mock-heading">Resolved</h2>
+    <p class="cs-premise">They have AI to deny your complaint. Now you have AI to fight back.</p>
+    <p class="cs-disclaimer">Resolved is a real, working prototype — <a href="https://github.com/arthivinod" target="_blank" rel="noopener">view the repo</a>. Two AI integrations (evidence extraction, letter drafting) run live against the Claude API; strategy selection, escalation, and the dashboard run on staged fallback data so the demo never breaks mid-pitch. Business impact figures below are reasoned estimates, not measured production numbers.</p>
+
+    <div class="cs-section">
+      <h3>1. The Original Workflow</h3>
+      <p>India has 250–350M+ online shoppers, and quick-commerce's 10–15 minute delivery promise generates complaints faster than anyone can review them. Today, resolving one means photographing the evidence, writing up what happened from memory, and dropping it into a vendor's support chat — which is increasingly a bot trained to stall, deflect, and quietly close the ticket before a human reads it.</p>
+      <p>If that fails — and it usually does — the consumer is on their own to figure out what's next. Almost nobody knows that the Consumer Protection Act 2019 exists, let alone which section applies to their case. The formal path (National Consumer Helpline → e-Daakhil → consumer court) is a maze of different portals, forms, and evidentiary requirements, slow enough that courts are sitting on a backlog of hundreds of thousands of cases, some taking years to close. Most people give up after the first bounced chat message.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>2. The Friction Points</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Friction</th><th>Root Cause</th><th>Impact</th></tr></thead>
+          <tbody>
+            <tr><td>Vendor bots optimize for closure, not resolution</td><td>Support chatbots are measured on "tickets closed," not "problem solved"</td><td>Users get a canned apology and a closed ticket, no compensation</td></tr>
+            <tr><td>Consumers don't know which law to cite</td><td>The Consumer Protection Act 2019 and its specific sections aren't public knowledge</td><td>Complaints get written in emotional, non-legal language that's easy for a company to dismiss as unsubstantiated</td></tr>
+            <tr><td>Escalation path is a maze, not a ladder</td><td>National Consumer Helpline → e-Daakhil → consumer court each have different portals, forms, and evidentiary requirements</td><td>Most people give up after the first bounced message because finding the next step takes real research</td></tr>
+            <tr><td>Evidence degrades before it's used</td><td>Screenshots, order IDs, and timestamps sit unorganized across chat threads and email</td><td>By the time someone escalates, they can't reconstruct a clean timeline</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cs-section">
+      <h3>3. Prerequisites</h3>
+      <ol class="cs-numbered">
+        <li><b>Legible evidence.</b> A blurry receipt photo or a screenshot with critical fields cropped out won't yield reliable extraction — the vision step has an honest floor on input quality.</li>
+        <li><b>A maintained vendor-to-channel map.</b> The system needs a current mapping of each vendor to its correct escalation channel and tone, since grievance contacts and complaint portals change over time.</li>
+        <li><b>A letter specific enough to be trusted and sent as-is.</b> If the draft reads as templated, users will over-edit it or not send it at all — the whole point is removing friction, not adding a review burden.</li>
+      </ol>
+    </div>
+
+    <div class="cs-section">
+      <h3>4. The AI-Enabled Redesign</h3>
+      <ol class="cs-numbered">
+        <li><b>Extract</b> — Claude's vision model reads a photo, screenshot, or forwarded email and pulls vendor, order ID, amount, issue, severity, and timestamp straight off the evidence. No forms, no formatting rules.</li>
+        <li><b>Strategize</b> — the system selects a vendor-specific play: the right channel, the right tone, and the exact clause of Indian consumer law to cite — e.g. Consumer Protection Act 2019 §2(11).</li>
+        <li><b>Draft</b> — a firm, law-cited complaint letter streams in live via the Claude API, ready to send or edit.</li>
+        <li><b>Escalate</b> — if ignored, the system climbs a five-step ladder on its own: vendor channel → public post → grievance officer → National Consumer Helpline → e-Daakhil consumer court.</li>
+      </ol>
+    </div>
+
+    <div class="cs-section">
+      <h3>5. Human Fallback Triggers</h3>
+      <ul class="cs-list">
+        <li><b>Low-confidence extraction</b> (e.g. vendor name or amount not clearly legible) — routed to a manual-entry confirmation step before any letter is drafted, never auto-filled with a guess.</li>
+        <li><b>Any rung involving a formal legal filing</b> (e-Daakhil consumer court) — requires explicit user confirmation before submission, since this creates a real legal record.</li>
+        <li><b>Issues that don't clearly map to a Consumer Protection Act violation</b> (e.g. a subjective quality complaint with no clear breach) — flagged for the user to review the drafted legal basis themselves, rather than citing a clause that may not actually apply.</li>
+        <li><b>The public-post escalation step</b> — always requires explicit per-case opt-in, never automatic, since a public post carries reputational and legal risk for the user too.</li>
+      </ul>
+    </div>
+
+    <div class="cs-section">
+      <h3>6. Sample AI Prompt</h3>
+      <div class="cs-code"><span class="cs-code-label">System prompt — evidence extraction</span>You are a consumer complaint evidence extraction assistant. You are given an
+image (photo, screenshot, or forwarded email) describing a consumer's problem
+with a purchase or service.
+
+Extract ONLY what is visibly present in the image:
+1. vendor: the company name, if visible or clearly inferable from a logo/domain
+2. order_id: any order/reference number visible
+3. amount: the disputed amount, with currency
+4. issue: a one-sentence factual description of the problem, using only what's
+   shown (not what's implied)
+5. severity: "minor" | "moderate" | "severe" based on amount, safety concern,
+   and breach language present
+6. timestamp: any date/time visible in the evidence
+
+If a field is not clearly visible or is ambiguous, output null for that field
+rather than guessing. Do not infer an order ID or amount from typical patterns
+— only report what is actually shown.
+
+Output strict JSON:
+{ "vendor": string|null, "order_id": string|null,
+  "amount": {"value": number, "currency": string}|null, "issue": string,
+  "severity": "minor"|"moderate"|"severe", "timestamp": string|null,
+  "confidence": "high"|"medium"|"low" }</div>
+
+      <div class="cs-code"><span class="cs-code-label">Example input — a screenshot of an order confirmation ("Order #4471293, Total ₹2,450, Zomato") with a chat message below: "my order arrived cold and 40 minutes late, support said nothing they can do"</span>[image: order confirmation + support chat screenshot]</div>
+
+      <div class="cs-code"><span class="cs-code-label">Example output</span>{
+  "vendor": "Zomato",
+  "order_id": "4471293",
+  "amount": { "value": 2450, "currency": "INR" },
+  "issue": "Order arrived cold and 40 minutes later than promised; vendor support declined to act.",
+  "severity": "moderate",
+  "timestamp": null,
+  "confidence": "high"
+}</div>
+      <p class="cs-caption"><b>Error handling:</b> if the image is unrelated to a consumer complaint (a random photo, a meme, an unrelated document), the model outputs all fields null, <code>confidence: "low"</code>, and does not fabricate a plausible-sounding complaint just because one was expected.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>7. Prompt Testing</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Case</th><th>Input</th><th>Expected Output</th><th>What a Bad Result Reveals</th></tr></thead>
+          <tbody>
+            <tr><td>Clear</td><td>The Zomato example above, fully legible</td><td>High confidence, full extraction, no nulls</td><td>Missing a clearly visible field means the vision extraction itself is under-performing, independent of prompt design</td></tr>
+            <tr><td>Ambiguous / low-signal</td><td>Blurry photo with only a partial order number visible</td><td>Order ID null, confidence low/medium, other fields extracted normally</td><td>A guessed order number here means the model is completing patterns instead of reading pixels — dangerous when that number gets cited in a legal letter</td></tr>
+            <tr><td>Multi-signal / contradictory</td><td>Evidence shows a struck-through original price and a separately charged price</td><td>Model picks the charged/disputed amount and notes the discrepancy in <code>issue</code>, rather than averaging or picking arbitrarily</td><td>Silently picking one number without flagging the discrepancy would produce a complaint letter arguing the wrong amount</td></tr>
+            <tr><td>Edge case</td><td>An unrelated image uploaded by mistake (e.g. a vacation photo)</td><td>All fields null, confidence low, no fabricated complaint</td><td>Generating a plausible-sounding complaint from irrelevant content reveals the model is pattern-completing rather than grounding in what's shown</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cs-section">
+      <h3>8. Business Impact</h3>
+      <div class="cs-table-wrap">
+        <table class="cs-table">
+          <thead><tr><th>Metric</th><th>Before</th><th>After</th><th>Reasoning</th></tr></thead>
+          <tbody>
+            <tr><td>Time to file one complaint</td><td>~35–45 min</td><td>~3 min</td><td>Extraction and drafting remove the two slowest manual steps — figuring out what to write and where to send it</td></tr>
+            <tr><td>Escalation follow-through</td><td>Most give up after the first bounced chat message — researching each of 5 rungs individually is the actual blocker</td><td>All 5 rungs advanced automatically, no research required from the user</td><td>A capability change, not a percentage — the system does the escalation research a user would otherwise have to do themselves</td></tr>
+            <tr><td>Legal grounding present</td><td>Most consumers don't know the Consumer Protection Act 2019 exists</td><td>Every drafted letter cites a specific, vendor/issue-matched clause</td><td>Framed as a capability, not a rate — the letter is either grounded or it isn't, and the strategy step ensures it is</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cs-math"><b>The math, shown:</b> if drafting and routing one complaint manually takes ~40 minutes and collapses to ~3 minutes of review, that's <b>~37 minutes saved per complaint</b> — and a repeat-issue customer (a recurring late-delivery pattern, say) filing 3 complaints in a quarter saves roughly <b>110 minutes</b>, without ever having to look up which law applies.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>9. Product Thinking — Risks &amp; Tradeoffs</h3>
+      <p><b>Risk: an incorrectly cited law section could undermine an otherwise valid complaint's credibility.</b> Mitigated by keeping the citation library narrow and reviewed rather than letting the model freely invent clause numbers — any citation the system's internal library doesn't recognize falls back to a letter that describes the issue plainly without a specific clause, rather than a confidently wrong one.</p>
+      <p><b>Risk: automated escalation without a human decision point could file something the user regrets</b> — a public post or a formal court filing carries consequences a closed support ticket doesn't. Mitigated by the explicit opt-in fallback trigger in Section 5.</p>
+      <p><b>Design choice — what stays human, and why:</b> deciding to escalate to a public post or a formal e-Daakhil filing always stays human. Extraction and drafting are the parts genuinely bottlenecked by manual effort; consequence-bearing decisions aren't the system's to make alone.</p>
+      <p><b>Dependency: quality is bounded by the vendor-escalation-channel map staying current.</b> A stale mapping sends a complaint to a dead-end address, which is arguably worse than doing nothing, since it creates false confidence that the complaint is actually progressing.</p>
+    </div>
+
+    <div class="cs-section">
+      <h3>10. Current State &amp; What's Next</h3>
+      <ul class="cs-list">
+        <li><b>Live today:</b> two real Claude API integrations — photo-to-facts extraction and complaint-letter drafting, both running against real evidence, not mocked data.</li>
+        <li><b>Staged for the demo:</b> strategy selection, escalation, and the dashboard run on fallback data so the prototype never breaks mid-pitch — a deliberate build-order choice, not a gap nobody noticed.</li>
+        <li><b>Not built yet:</b> no backend, auth, or persistence — state lives in React and resets on refresh. No real vendor or regulator integrations; filing, posting, and calling are simulated end states.</li>
+        <li><b>Next build, honestly:</b> wiring the escalation ladder to real channels, starting with the two or three highest-volume e-commerce and food-delivery vendors, and persisting case state so a complaint survives a refresh.</li>
+      </ul>
+    </div>
+
+    <a href="index.html#sectionWork" class="mock-link cs-back-link">
+      <span class="tick tick-tl"></span><span class="tick tick-br"></span>
+      ← Back to portfolio
+    </a>
+  </div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
