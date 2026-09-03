@@ -192,6 +192,21 @@ a{ color:inherit; text-decoration:none; }
 /* ---------- Career highlights — data viz ---------- */
 .mock-inner.wide{ max-width:64rem; }
 
+.trait-tags{ display:flex; flex-wrap:wrap; gap:0.6rem; margin-top:0.5rem; }
+.trait-tag{ display:inline-block; font-size:0.82rem; font-weight:600; letter-spacing:0.02em; color:var(--accent-electric); background:rgba(139,127,251,0.1); border:1px solid rgba(139,127,251,0.3); border-radius:999px; padding:0.4rem 0.95rem; }
+
+.career-list{ display:flex; flex-direction:column; margin-top:1rem; }
+.career-item{ padding:1.5rem 0 1.5rem 1.5rem; border-left:2px solid var(--border); position:relative; }
+.career-item::before{ content:""; position:absolute; left:-6px; top:1.95rem; width:10px; height:10px; border-radius:50%; background:var(--bg); border:2px solid var(--accent-electric); }
+.career-item:first-child{ padding-top:0; }
+.career-item:first-child::before{ top:0.45rem; }
+.career-item:last-child{ border-left-color:transparent; }
+.career-item-head{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:0.5rem 1rem; }
+.career-role{ font-size:1.15rem; font-weight:600; letter-spacing:-0.01em; color:var(--text); }
+.career-dates{ font-size:0.85rem; color:var(--text-secondary); white-space:nowrap; }
+.career-company{ font-size:0.92rem; color:var(--accent-electric); margin-top:0.25rem; }
+.career-note{ font-size:0.98rem; color:var(--text-secondary); line-height:1.55; margin-top:0.5rem; max-width:38rem; }
+
 .stats-grid{
   display:grid; grid-template-columns:repeat(3, 1fr); gap:1.25rem;
   margin-top:1rem;
