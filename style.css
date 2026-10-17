@@ -288,6 +288,22 @@ a{ color:inherit; text-decoration:none; }
 .project-card-link:hover::after{ transform:scaleX(1); opacity:1; }
 .project-card-link:hover{ text-shadow:0 0 16px rgba(255,255,255,0.5); }
 
+/* ---------- Other projects (lighter secondary list) ---------- */
+.other-projects{ margin-top:2.5rem; }
+.other-projects-label{ font-size:0.78rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-secondary); margin-bottom:0.9rem; }
+.other-project-row{
+  display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap;
+  background:var(--card-bg); border:1px solid var(--border); border-radius:16px;
+  padding:1.25rem 1.5rem; transition: border-color 200ms var(--ease-pop), transform 200ms var(--ease-pop);
+}
+.other-project-row:hover{ border-color:var(--accent-electric); transform:translateY(-1px); }
+.other-project-row-text{ flex:1; min-width:16rem; }
+.other-project-row-text h3{ font-size:1.05rem; font-weight:600; letter-spacing:-0.01em; color:var(--text); margin-bottom:0.3rem; }
+.other-project-row-text p{ font-size:0.92rem; color:var(--text-secondary); line-height:1.5; }
+.other-project-row-tag{ font-size:0.74rem; font-weight:600; letter-spacing:0.02em; color:var(--accent-electric); background:rgba(139,127,251,0.1); border:1px solid rgba(139,127,251,0.3); border-radius:999px; padding:0.3rem 0.8rem; white-space:nowrap; }
+.other-project-row-arrow{ color:var(--text-secondary); font-size:1.1rem; transition: color 200ms var(--ease-pop), transform 200ms var(--ease-pop); }
+.other-project-row:hover .other-project-row-arrow{ color:var(--accent-electric); transform:translateX(3px); }
+
 /* ---------- Case study ---------- */
 .cs-page-header{ position:relative; z-index:1; padding:3vw 6vw 0; max-width:52rem; margin:0 auto; }
 .case-study{ padding:3vw 6vw 10vw; position:relative; z-index:1; }
